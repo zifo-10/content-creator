@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -25,9 +25,12 @@ class CourseRequest(BaseModel):
 
 @app.post("/generate-course", response_model=List[VideoOutLinesWithContent])
 def generate_course(request: CourseRequest):
-    return generate_course_content(
-        course_name=request.course_name,
-        target_audience=request.target_audience,
-        course_level=request.course_level,
-        notes=request.notes
-    )
+    try:
+        return generate_course_content(
+            course_name=request.course_name,
+            target_audience=request.target_audience,
+            course_level=request.course_level,
+            notes=request.notes
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
